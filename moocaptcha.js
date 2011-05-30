@@ -1,5 +1,9 @@
 var MooCaptcha, $moocaptcha;
 
+if(!window.$empty) {
+  var $empty = window.$empty = function() { };
+}
+
 (function($,$$) {
 
 MooCaptcha = new Class({
@@ -44,8 +48,8 @@ MooCaptcha.extend({
     return !! window.Recaptcha;
   },
 
-	query:function() {
-		return this.instances.last;
+	query:function(id) {
+    return $(id).retrieve('MooCaptcha');
 	},
 
   onReady : function() {
@@ -64,6 +68,7 @@ MooCaptcha.implement({
 		theme:'clean',
     lang:'en',
     showWhenReady : true,
+    fadeWhenReady : true,
     tabIndex : null,
     customTranslations : {}
 	},
@@ -152,6 +157,14 @@ MooCaptcha.implement({
     }
   },
 
+  getID:function() {
+    return this.getContainer.id;
+  },
+
+  setID:function(name) {
+    this.getContainer().id = id;
+  },
+
 	hide:function() {
 		this.getContainer().setStyle('display','none');
 	},
@@ -159,6 +172,21 @@ MooCaptcha.implement({
 	show:function() {
 		this.getContainer().setStyle('display','block');
 	},
+
+  fadeIn:function() {
+    if(this.isHidden()) {
+      var c = this.getContainer();
+      c.setStyle('opacity',1);
+      this.show();
+      c.fade('in');
+    }
+  },
+
+  fadeOut:function() {
+    if(this.isVisible()) {
+      this.getContainer().get('tween').start('opacity',0).chain(this.hide.bind(this));
+    } 
+  },
 
   isHidden:function() {
     return this.getContainer().getStyle('display') == 'none';
@@ -208,6 +236,10 @@ MooCaptcha.implement({
     return !! this.options.showWhenReady;
   },
 
+  fadeWhenReady:function() {
+    return !! this.options.fadeWhenReady;
+  },
+
   renew:function() {
     Recaptcha._reload();
     this.$event('renew');
@@ -240,7 +272,10 @@ MooCaptcha.implement({
 		this.$event('ready');
     this.ready = true;
     this.loading = false;
-    if(this.showWhenReady()) {
+    if(this.fadeWhenReady()) {
+      this.fadeIn();
+    }
+    else if(this.showWhenReady()) {
 		  this.show();
     }
 	},
