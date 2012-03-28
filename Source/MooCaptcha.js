@@ -67,6 +67,7 @@ MooCaptcha.implement({
     downloadLibraries : true,
 		theme:'clean',
     lang:'en',
+    showLoading : true,
     showWhenReady : true,
     fadeWhenReady : true,
     tabIndex : null,
@@ -77,10 +78,16 @@ MooCaptcha.implement({
 		this.container = $(container);
 		if(this.container.retrieve('MooCaptcha')) return;
 		this.container.store('MooCaptcha',this);
+    this.container.addClass('moocaptcha');
 		this.setOptions(options);
     this.loading = false;
 		this.$build();
-		this.hide();
+    if(!this.options.showLoading) {
+      this.hide();
+    }
+    else {
+      this.showLoading();
+    }
 		MooCaptcha.register(this);
 	},
 
@@ -246,7 +253,7 @@ MooCaptcha.implement({
   },
 
 	destroy:function() {
-		this.container.destroy();
+		this.getContainer().destroy();
 	},
 
   $onFocus : function() {
@@ -260,7 +267,16 @@ MooCaptcha.implement({
 	$onLoading:function() {
 		this.$event('loading');
     this.loading = true;
+    this.showLoading();
 	},
+
+  showLoading : function() {
+    this.getContainer().addClass('loading');
+  },
+
+  hideLoading : function() {
+    this.getContainer().removeClass('loading');
+  },
 
 	$onReady:function() {
     this.getInput().addEvents({
@@ -272,6 +288,8 @@ MooCaptcha.implement({
 		this.$event('ready');
     this.ready = true;
     this.loading = false;
+    this.hideLoading();
+
     if(this.fadeWhenReady()) {
       this.fadeIn();
     }

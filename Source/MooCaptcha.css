@@ -1,0 +1,4 @@
+.moocaptcha.loading {
+  background:url('./images/loading.gif') no-repeat 10px center;
+  padding:20px;
+}
